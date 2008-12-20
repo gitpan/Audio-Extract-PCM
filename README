@@ -2,11 +2,11 @@ NAME
     Audio::Extract::PCM - Extract PCM data from audio files
 
 VERSION
-    Version 0.01
+    Version 0.02
 
 SYNOPSIS
     This module's purpose is to extract PCM data from various audio formats.
-    PCM is the format in that you send data to your sound card driver. This
+    PCM is the format in which you send data to your sound card driver. This
     module aims to provide a single interface for PCM extraction from
     various audio formats, compressed and otherwise.
 
@@ -44,8 +44,8 @@ METHODS
 
     The sample size is specified in bytes, so 2 means 16 bit sound.
 
-    Returns the pcm data as a string, or an empty list in case of an error
-    (cf. "error").
+    Returns the pcm data as a reference to a string, or an empty list in
+    case of an error (cf. "error").
 
   error
     Returns the last error that occured for this object.

@@ -1,13 +1,12 @@
 Build.PL
 Changes
 lib/Audio/Extract/PCM.pm
+Makefile.PL
 MANIFEST			This list of files
+META.yml
+README
 t/00-load.t
 t/extract.t
 t/pod-coverage.t
 t/pod.t
-t/sine.wav
 t/sine.wav.gz
-Makefile.PL
-README
-META.yml

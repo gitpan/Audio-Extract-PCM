@@ -25,7 +25,7 @@ my $extractor = Audio::Extract::PCM->new('t/sine.wav');
 my $extracted = $extractor->pcm($freq, $samplesize, $channels)
     or die $extractor->error;
 
-ok($samples eq $extracted, 'extract ok');
+ok($samples eq $$extracted, 'extract ok');
 diag('Tested data was '.length($samples).' bytes');
 
 my $bad = Audio::Extract::PCM->new('no-such-file.wav');

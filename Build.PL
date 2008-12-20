@@ -16,6 +16,9 @@ my $builder = Module::Build->new(
     requires => {
         'IO::CaptureOutput' => '1.10', # need 1.10 for success flag and error code
     },
+#    requires_external_bin => {
+#        sox => 0,
+#    },
     add_to_cleanup      => [ 'Audio-Extract-PCM-*' ],
 );
 

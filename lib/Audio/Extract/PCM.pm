@@ -10,17 +10,17 @@ Audio::Extract::PCM - Extract PCM data from audio files
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
 
 This module's purpose is to extract PCM data from various audio formats.  PCM
-is the format in that you send data to your sound card driver.  This module
+is the format in which you send data to your sound card driver.  This module
 aims to provide a single interface for PCM extraction from various audio
 formats, compressed and otherwise.
 
@@ -74,8 +74,8 @@ Extracts PCM data.
 
 The sample size is specified in bytes, so C<2> means 16 bit sound.
 
-Returns the pcm data as a string, or an empty list in case of an error (cf.
-L</error>).
+Returns the pcm data as a reference to a string, or an empty list in case of an
+error (cf.  L</error>).
 
 =cut
 
@@ -127,9 +127,8 @@ sub pcm {
     }
 
     substr($pcm, 0, 44, ''); # strip wave header (we know the details, we specified them to sox)
-    $! = 0;
 
-    return $pcm;
+    return \$pcm;
 }
 
 
