@@ -6,3 +6,9 @@ Revision history for Audio-Extract-PCM
 0.02    2008-12-20
         Remove accidentally included sine.wav (need only sine.wav.gz)
         Return the pcm data as a reference.
+
+0.02_01 2008-12-21     
+        Warn for sox warnings.
+        Check for sox program in Build.PL
+        extract.t: Create sine.wav in base directory, not in t/, because of
+            permission problems.

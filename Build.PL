@@ -2,6 +2,19 @@ use strict;
 use warnings;
 use Module::Build;
 
+use IO::CaptureOutput qw(qxx);
+
+my ($vers_output, $vers_error, $success) = qxx('sox', '--version');
+print STDERR $vers_error;
+
+if ($success) {
+    my ($soxver) = $vers_output =~ /v([\d.]+)/
+        or die "Strange sox --version output: $vers_output\n";
+    warn "SoX version $soxver found.\n";
+} else {
+    die "Could not run the sox program; please make sure it is installed.\n";
+}
+
 my $builder = Module::Build->new(
     create_readme               => 1,
     create_makefile_pl          => 'small',
@@ -12,6 +25,7 @@ my $builder = Module::Build->new(
     build_requires => {
         'Compress::Zlib' => 0,
         'Test::More' => 0,
+        'IO::CaptureOutput' => '1.10',
     },
     requires => {
         'IO::CaptureOutput' => '1.10', # need 1.10 for success flag and error code

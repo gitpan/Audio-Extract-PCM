@@ -2,7 +2,7 @@ NAME
     Audio::Extract::PCM - Extract PCM data from audio files
 
 VERSION
-    Version 0.02
+    Version 0.02_01
 
 SYNOPSIS
     This module's purpose is to extract PCM data from various audio formats.
@@ -51,12 +51,14 @@ METHODS
     Returns the last error that occured for this object.
 
 SEE ALSO
-    Audio::Mad - Module to decode MPEG files, in particular MP3
-    Ogg::Vorbis::Decoder - Module to decode Vorbis files
-    <http://en.wikipedia.org/wiki/Pulse-code_modulation>
-            PCM (Pulse-code modulation)
+    *       Audio::Mad - Module to decode MPEG files, in particular MP3
 
-    <http://sox.sourceforge.net/> - SoX homepage
+    *       Ogg::Vorbis::Decoder - Module to decode Vorbis files
+
+    *       <http://en.wikipedia.org/wiki/Pulse-code_modulation> - PCM
+            (Pulse-code modulation)
+
+    *       <http://sox.sourceforge.net/> - SoX homepage
 
 AUTHOR
     Christoph Bussenius, "<pepe at cpan.org>"

@@ -1,6 +1,6 @@
 ---
 name: Audio-Extract-PCM
-version: 0.02
+version: 0.02_01
 author:
   - 'Christoph Bussenius <pepe@cpan.org>'
 abstract: Extract PCM data from audio files
@@ -11,11 +11,12 @@ requires:
   IO::CaptureOutput: 1.10
 build_requires:
   Compress::Zlib: 0
+  IO::CaptureOutput: 1.10
   Test::More: 0
 provides:
   Audio::Extract::PCM:
     file: lib/Audio/Extract/PCM.pm
-    version: 0.02
+    version: 0.02_01
 generated_by: Module::Build version 0.3
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

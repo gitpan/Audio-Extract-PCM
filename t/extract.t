@@ -12,7 +12,7 @@ my $wav = Compress::Zlib::memGunzip (do {
     <$fh>;
 });
 
-open my $wavfh, '>', 't/sine.wav' or die "t/sine.wav: $!";
+open my $wavfh, '>', 'sine.wav' or die "sine.wav: $!";
 syswrite($wavfh, $wav) or die $!;
 close $wavfh or die $!;
 
@@ -21,7 +21,7 @@ my $freq = 44100;
 my $samplesize = 2;
 my $channels = 2;
 
-my $extractor = Audio::Extract::PCM->new('t/sine.wav');
+my $extractor = Audio::Extract::PCM->new('sine.wav');
 my $extracted = $extractor->pcm($freq, $samplesize, $channels)
     or die $extractor->error;
 

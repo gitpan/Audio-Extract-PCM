@@ -10,11 +10,11 @@ Audio::Extract::PCM - Extract PCM data from audio files
 
 =head1 VERSION
 
-Version 0.02
+Version 0.02_01
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.02_01';
 
 
 =head1 SYNOPSIS
@@ -126,6 +126,8 @@ sub pcm {
         return ();
     }
 
+    warn $soxerr if length $soxerr;
+
     substr($pcm, 0, 44, ''); # strip wave header (we know the details, we specified them to sox)
 
     return \$pcm;
@@ -155,15 +157,21 @@ sub error {
 
 =over 8
 
-=item L<Audio::Mad> - Module to decode MPEG files, in particular MP3
+=item *
 
-=item L<Ogg::Vorbis::Decoder> - Module to decode Vorbis files
+L<Audio::Mad> - Module to decode MPEG files, in particular MP3
 
-=item L<http://en.wikipedia.org/wiki/Pulse-code_modulation>
+=item *
 
-PCM (Pulse-code modulation)
+L<Ogg::Vorbis::Decoder> - Module to decode Vorbis files
 
-=item L<http://sox.sourceforge.net/> - SoX homepage
+=item *
+
+L<http://en.wikipedia.org/wiki/Pulse-code_modulation> - PCM (Pulse-code modulation)
+
+=item *
+
+L<http://sox.sourceforge.net/> - SoX homepage
 
 =back
 
