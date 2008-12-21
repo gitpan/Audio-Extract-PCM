@@ -5,7 +5,6 @@ Makefile.PL
 MANIFEST			This list of files
 META.yml
 README
-sine.wav
 t/00-load.t
 t/extract.t
 t/pod-coverage.t

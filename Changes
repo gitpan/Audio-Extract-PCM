@@ -12,3 +12,7 @@ Revision history for Audio-Extract-PCM
         Check for sox program in Build.PL
         extract.t: Create sine.wav in base directory, not in t/, because of
             permission problems.
+
+0.02_02 2008-12-21
+        Don't use IO::CaptureOutput in Build.PL, backticks will suffice here (we
+        need it anyway to run the module, but Build.PL is better kept simple.)
