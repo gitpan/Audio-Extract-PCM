@@ -16,3 +16,7 @@ Revision history for Audio-Extract-PCM
 0.02_02 2008-12-21
         Don't use IO::CaptureOutput in Build.PL, backticks will suffice here (we
         need it anyway to run the module, but Build.PL is better kept simple.)
+
+0.03    2009-01-07
+        * Included an example script: any_to_pcm.pl
+        * Add Module::Build to configure_requires and build_requires

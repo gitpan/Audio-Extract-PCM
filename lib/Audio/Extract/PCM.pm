@@ -10,11 +10,11 @@ Audio::Extract::PCM - Extract PCM data from audio files
 
 =head1 VERSION
 
-Version 0.02_02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02_02';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -26,8 +26,8 @@ formats, compressed and otherwise.
 
 Currently the implementation makes use of the external "sox" program.  As of
 2008, sox's supported input formats include "wav", "mp3", "ogg/vorbis", "flac",
-if you have compiled sox with support for them, but does not include support
-for "wma".
+if you have compiled sox with support for them, but do not include "wma" or
+"aac".
 
 I have chosen the use of "sox" for the first implementation of this module
 because it already has an abstract interface to many formats.  However I plan
@@ -115,7 +115,7 @@ sub pcm {
     unless ($success) {
         my $err;
         if ($!) {
-            $err = length($soxerr) ? $! . " - $soxerr" : "$!";
+            $err = length($soxerr) ? "$! - $soxerr" : "$!";
         } else {
             $err = length($soxerr) ? $soxerr : "Error running sox";
         }

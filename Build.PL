@@ -19,12 +19,19 @@ my $builder = Module::Build->new(
     license             => 'perl',
     dist_author         => 'Christoph Bussenius <pepe@cpan.org>',
     dist_version_from   => 'lib/Audio/Extract/PCM.pm',
+    configure_requires => {
+        'Module::Build' => 0,
+    },
     build_requires => {
         'Compress::Zlib' => 0,
         'Test::More' => 0,
+        'Module::Build' => 0,
     },
     requires => {
         'IO::CaptureOutput' => '1.10', # need 1.10 for success flag and error code
+    },
+    no_index => {
+        directory => 'example',
     },
 #    requires_external_bin => {
 #        sox => 0,
