@@ -6,6 +6,11 @@ use Test::More tests => 2;
 use Compress::Zlib;
 use bytes;
 
+my @cleanups;
+END {
+    $_->() for @cleanups;
+}
+
 my $wav = Compress::Zlib::memGunzip (do {
     open my $fh, '<', 't/sine.wav.gz' or die "t/sine.wav.gz: $!";
     local $/;
@@ -13,6 +18,7 @@ my $wav = Compress::Zlib::memGunzip (do {
 });
 
 open my $wavfh, '>', 'sine.wav' or die "sine.wav: $!";
+push @cleanups, sub { unlink ('sine.wav') or warn "unlink: sine.wav: $!"; };
 syswrite($wavfh, $wav) or die $!;
 close $wavfh or die $!;
 

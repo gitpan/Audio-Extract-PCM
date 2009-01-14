@@ -11,3 +11,4 @@ t/extract.t
 t/pod-coverage.t
 t/pod.t
 t/sine.wav.gz
+t/sox.t

@@ -20,3 +20,9 @@ Revision history for Audio-Extract-PCM
 0.03    2009-01-07
         * Included an example script: any_to_pcm.pl
         * Add Module::Build to configure_requires and build_requires
+
+0.03_01 2009-01-14
+        * Remove sine.wav after testing (don't waste disk space if you keep the
+          source directory lingering around)
+        * Report sox version in test suite (want to get more info from
+          reporters)
