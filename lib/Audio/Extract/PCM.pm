@@ -10,11 +10,11 @@ Audio::Extract::PCM - Extract PCM data from audio files
 
 =head1 VERSION
 
-Version 0.03_01
+Version 0.03_02
 
 =cut
 
-our $VERSION = '0.03_01';
+our $VERSION = '0.03_02';
 
 
 =head1 SYNOPSIS
@@ -66,6 +66,17 @@ sub new {
     return $this;
 }
 
+my %bppvals = (
+    1 => '-b',
+    2 => '-w',
+    4 => '-l',
+    8 => '-d',
+);
+
+if (_get_sox_version() && _get_sox_version() > '13.0.0') {
+    $bppvals{$_} = '-' . $_ for keys %bppvals;
+}
+
 =head2 pcm
 
 Parameters: C<frequency>, C<samplesize>, C<channels>
@@ -89,12 +100,7 @@ sub pcm {
 
     # Newer soxes have the flags -1, -2, -4, -8, but the old flags still work
     # in newer versions, even though they aren't documented.
-    my $sparam = {
-        1 => '-b',
-        2 => '-w',
-        4 => '-l',
-        8 => '-d',
-    }->{$samplesize} or croak "Unsupported sample size: $samplesize";
+    my $sparam = $bppvals{$samplesize} or croak "Unsupported sample size: $samplesize";
 
     my $fn = $this->{filename};
 
@@ -102,9 +108,12 @@ sub pcm {
 
     local $ENV{LC_ALL} = 'C';
 
+    my @command = ('sox', $fn, $sparam, '-r'.$freq, '-c'.$channels, '-twav', '-');
+
+    warn qq(Running "@command"\n) if $ENV{DEBUG};
+
     $! = 0;
-    my ($pcm, $soxerr, $success) = qxx(
-        'sox', $fn, $sparam, '-r'.$freq, '-c'.$channels, '-twav', '-');
+    my ($pcm, $soxerr, $success) = qxx(@command);
 
     chomp $soxerr;
 
@@ -195,5 +204,28 @@ under the same terms as Perl itself.
 
 
 =cut
+
+{
+    my $soxver;
+
+    # This will be documented and without underscore in Audio::Extract::PCM::Backend::SoX
+    # once I release the multiple-backends branch.
+
+    sub _get_sox_version {
+        return $soxver if defined $soxver;
+
+        my $vers_output = `sox --version`;
+
+        if (defined $vers_output) {
+            ($soxver) = $vers_output =~ /v(\d+\.\d+\.\d+)/
+                or warn "Strange sox --version output: $vers_output\n";
+        }
+
+        use version;
+        $soxver = version->new($soxver);
+
+        return $soxver;
+    }
+}
 
 1; # End of Audio::Extract::PCM

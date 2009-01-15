@@ -29,6 +29,7 @@ my $builder = Module::Build->new(
     },
     requires => {
         'IO::CaptureOutput' => '1.10', # need 1.10 for success flag and error code
+        'version' => 0,
     },
     no_index => {
         directory => 'example',

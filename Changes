@@ -26,3 +26,9 @@ Revision history for Audio-Extract-PCM
           source directory lingering around)
         * Report sox version in test suite (want to get more info from
           reporters)
+
+0.03_02 2009-01-15
+        * Use -1/-2/-4/-8 rather than -b/-w/-l/-d in newer sox versions.
+        * Removed -T from 00-load.t.  For the record, this module isn't taint-safe.
+          Really, how am I supposed to portably run "sox" without depending on
+          PATH?  Imho, taint mode is a ridiculous concept.

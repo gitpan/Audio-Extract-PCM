@@ -1,6 +1,6 @@
 ---
 name: Audio-Extract-PCM
-version: 0.03_01
+version: 0.03_02
 author:
   - 'Christoph Bussenius <pepe@cpan.org>'
 abstract: Extract PCM data from audio files
@@ -11,6 +11,7 @@ configure_requires:
   Module::Build: 0
 requires:
   IO::CaptureOutput: 1.10
+  version: 0
 build_requires:
   Compress::Zlib: 0
   Module::Build: 0
@@ -18,7 +19,7 @@ build_requires:
 provides:
   Audio::Extract::PCM:
     file: lib/Audio/Extract/PCM.pm
-    version: 0.03_01
+    version: 0.03_02
 no_index:
   directory: example
 generated_by: Module::Build version 0.3
