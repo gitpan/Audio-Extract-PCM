@@ -1,6 +1,6 @@
 ---
 name: Audio-Extract-PCM
-version: 0.03_03
+version: 0.04
 author:
   - 'Christoph Bussenius <pepe@cpan.org>'
 abstract: Extract PCM data from audio files
@@ -19,7 +19,7 @@ build_requires:
 provides:
   Audio::Extract::PCM:
     file: lib/Audio/Extract/PCM.pm
-    version: 0.03_03
+    version: 0.04
 no_index:
   directory: example
 generated_by: Module::Build version 0.31

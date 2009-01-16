@@ -36,3 +36,6 @@ Revision history for Audio-Extract-PCM
 0.03_03 2009-01-16
         * Ignore capitalization in the test suite while checking for sox errors
           (seems to have changed in newer soxes)
+
+0.04    2009-01-16
+        * Identical to 0.03_03
