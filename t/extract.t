@@ -36,4 +36,4 @@ diag('Tested data was '.length($samples).' bytes');
 
 my $bad = Audio::Extract::PCM->new('no-such-file.wav');
 $bad->pcm($freq, $samplesize, $channels);
-like($bad->error, qr(Can't open input file), 'get sox\'s errors');
+like($bad->error, qr(Can't open input file)i, 'get sox\'s errors');

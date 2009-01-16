@@ -32,3 +32,7 @@ Revision history for Audio-Extract-PCM
         * Removed -T from 00-load.t.  For the record, this module isn't taint-safe.
           Really, how am I supposed to portably run "sox" without depending on
           PATH?  Imho, taint mode is a ridiculous concept.
+
+0.03_03 2009-01-16
+        * Ignore capitalization in the test suite while checking for sox errors
+          (seems to have changed in newer soxes)
