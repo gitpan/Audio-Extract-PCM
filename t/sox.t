@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 use Test::More;
+use IO::CaptureOutput qw(qxy);
+use POSIX qw(WIFEXITED);
 
 
 # The sox version is printed in the test suite (rather than in Build.PL),
@@ -18,9 +20,10 @@ unless (eval "use $soxbackend; 1") {
 my $soxversion = $soxbackend->get_sox_version();
 diag("SoX version $soxversion found.");
 
-my $help = `sox --help`;
+my ($help, undef, $status) = qxy('sox', '-h');
+die "couldn't run sox -h" unless WIFEXITED($status);
 
-unless ($help =~ /SUPPORTED FILE FORMATS: .*\b(?:ogg|vorbis)\b/) {
+unless ($help =~ /SUPPORTED FILE FORMATS: .*\b(?:ogg|vorbis)\b/i) {
     plan skip_all => 'your sox has no ogg';
 }
 

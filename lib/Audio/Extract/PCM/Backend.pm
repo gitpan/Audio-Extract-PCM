@@ -18,11 +18,19 @@ backend classes provide a common interface to other modules:
 
 =item *
 
+L<Audio::Extract::PCM::Backend::Mad> - uses L<Audio::Mad>
+
+=item *
+
 L<Audio::Extract::PCM::Backend::SoX> - uses the external "sox" program
 
 =item *
 
-L<Audio::Extract::PCM::Backend::Mad> - uses L<Audio::Mad>
+L<Audio::Extract::PCM::Backend::SndFile> - uses L<Audio::SndFile>
+
+=item *
+
+L<Audio::Extract::PCM::Backend::Vorbis> - uses L<Ogg::Vorbis::Decoder>
 
 =back
 

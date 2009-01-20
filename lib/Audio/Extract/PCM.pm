@@ -12,11 +12,11 @@ Audio::Extract::PCM - Extract PCM data from audio files
 
 =head1 VERSION
 
-Version 0.04_52
+Version 0.04_53
 
 =cut
 
-our $VERSION = '0.04_52';
+our $VERSION = '0.04_53';
 
 
 =head1 SYNOPSIS
@@ -263,15 +263,15 @@ You shouldn't specify both C<bytes> and C<seconds>.
 Maybe I'll get rid of the C<append> option in future releases.  And maybe of
 the I<at least>.
 
+"Strange" lvalues, like the return value of substr(), are not supported as the
+C<$buffer> argument (yet?) -- at least for most backends.
+
 =item Return value
 
 If C<seconds> were specified, the number of seconds of the read audio data will
 be returned.  Otherwise, the number of read bytes will be returned.  On eof, 0
 will be returned.  On error, C<undef> will be returned (in scalar context), and
 the error may be retrieved via error().
-
-"Strange" lvalues, like the return value of substr(), are not supported as the
-C<$buffer> argument (yet?) -- at least for most backends.
 
 =back
 
@@ -413,7 +413,7 @@ for compiling.
 
 libsndfile had been supporting mainly uncompressed formats for a while, but
 newer releases seem to support Ogg/Vorbis and FLAC too.  At the moment the
-SndFile backend is not tried for these formats because my system segfaults.
+SndFile backend won't be tried for these formats because my system segfaults.
 Well, I'm going to make that configurable anyway.
 
 About the vorbis support:  As I understand it, libsndfile's read function isn't

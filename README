@@ -2,7 +2,7 @@ NAME
     Audio::Extract::PCM - Extract PCM data from audio files
 
 VERSION
-    Version 0.04_52
+    Version 0.04_53
 
 SYNOPSIS
     This module's purpose is to extract PCM data from various audio formats.
@@ -102,16 +102,16 @@ METHODS
             Maybe I'll get rid of the "append" option in future releases.
             And maybe of the *at least*.
 
+            "Strange" lvalues, like the return value of substr(), are not
+            supported as the $buffer argument (yet?) -- at least for most
+            backends.
+
     Return value
             If "seconds" were specified, the number of seconds of the read
             audio data will be returned. Otherwise, the number of read bytes
             will be returned. On eof, 0 will be returned. On error, "undef"
             will be returned (in scalar context), and the error may be
             retrieved via error().
-
-            "Strange" lvalues, like the return value of substr(), are not
-            supported as the $buffer argument (yet?) -- at least for most
-            backends.
 
   error
     Returns the last error that occured for this object.
@@ -172,7 +172,7 @@ DEPENDENCIES
 
             libsndfile had been supporting mainly uncompressed formats for a
             while, but newer releases seem to support Ogg/Vorbis and FLAC
-            too. At the moment the SndFile backend is not tried for these
+            too. At the moment the SndFile backend won't be tried for these
             formats because my system segfaults. Well, I'm going to make
             that configurable anyway.
 
