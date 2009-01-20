@@ -1,11 +1,11 @@
 #!perl
 use strict;
 use warnings;
-use Test::More tests => 1;
+use Test::More;
 
 
-# This stuff is already run in Build.PL, but I need it in the test suite too,
-# because the CPAN reporters don't show me the Build.PL output.
+# This is in the test suite (rather than in Build.PL), because the CPAN
+# Reporters only show the test output.
 
 my $vers_output = `sox --version`;
 
@@ -14,10 +14,22 @@ if (defined $vers_output) {
         or die "Strange sox --version output: $vers_output\n";
     warn "SoX version $soxver found.\n";
 } else {
-    die "Could not run the sox program; please make sure it is installed.\n";
+    warn "The sox program was not found.  Don't be bothered, it's only one backend of many.";
+    plan skip_all => 'no sox';
 }
 
-SKIP: {
-    # I must plan a test, otherwise the test suite complains
-    skip 'this test program is only needed for its diagnostics', 1;
+my $help = `sox --help`;
+
+unless ($help =~ /SUPPORTED FILE FORMATS: .*\bogg\b/) {
+    plan skip_all => 'your sox has no ogg';
 }
+
+plan tests => 5;
+
+require Audio::Extract::PCM;
+my $extractor = Audio::Extract::PCM->new('t/sine.ogg', backend => 'SoX');
+ok($extractor->pcm(undef, undef, undef));
+is($extractor->format->freq, 44100);
+is($extractor->format->samplesize, 2);
+is($extractor->format->channels, 2);
+is($extractor->format->duration, 10);

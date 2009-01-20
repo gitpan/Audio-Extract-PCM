@@ -39,3 +39,9 @@ Revision history for Audio-Extract-PCM
 
 0.04    2009-01-16
         * Identical to 0.03_03
+
+0.04_51 2009-01-20
+        * Development release from my "multi" branch.  This is the first
+          release to include several backends, and the first release that
+          doesn't depend on sox any more (it recommends it instead).
+        * Quite a lot differences to 0.04.

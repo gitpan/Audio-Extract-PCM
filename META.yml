@@ -1,6 +1,6 @@
 ---
 name: Audio-Extract-PCM
-version: 0.04
+version: 0.04_51
 author:
   - 'Christoph Bussenius <pepe@cpan.org>'
 abstract: Extract PCM data from audio files
@@ -10,16 +10,33 @@ resources:
 configure_requires:
   Module::Build: 0
 requires:
+  Class::Accessor: 0
+  Class::Inspector: 0
   IO::CaptureOutput: 1.10
+  List::MoreUtils: 0
   version: 0
 build_requires:
   Compress::Zlib: 0
   Module::Build: 0
   Test::More: 0
+recommends:
+  Sys::Mmap::Simple: 0
 provides:
   Audio::Extract::PCM:
     file: lib/Audio/Extract/PCM.pm
-    version: 0.04
+    version: 0.04_51
+  Audio::Extract::PCM::Backend:
+    file: lib/Audio/Extract/PCM/Backend.pm
+  Audio::Extract::PCM::Backend::Mad:
+    file: lib/Audio/Extract/PCM/Backend/Mad.pm
+  Audio::Extract::PCM::Backend::SndFile:
+    file: lib/Audio/Extract/PCM/Backend/SndFile.pm
+  Audio::Extract::PCM::Backend::SoX:
+    file: lib/Audio/Extract/PCM/Backend/SoX.pm
+  Audio::Extract::PCM::Backend::Vorbis:
+    file: lib/Audio/Extract/PCM/Backend/Vorbis.pm
+  Audio::Extract::PCM::Format:
+    file: lib/Audio/Extract/PCM/Format.pm
 no_index:
   directory: example
 generated_by: Module::Build version 0.31
