@@ -52,3 +52,7 @@ Revision history for Audio-Extract-PCM
 0.04_53 2009-01-20
         * Works better with old soxes.
         * Some pod fixes.
+
+0.04_54 2009-01-20
+        * Get signedness from sox, and tell it to use either signed or unsigned
+          format.

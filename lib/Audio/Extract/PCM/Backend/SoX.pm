@@ -12,10 +12,6 @@ unless (defined get_sox_version()) {
 
 my @bppvals = (
     {
-        value => '-w',
-        samplesize => 2,
-    },
-    {
         value => '-b',
         samplesize => 1,
     },
@@ -26,6 +22,20 @@ my @bppvals = (
     {
         value => '-d',
         samplesize => 8,
+    },
+    {
+        value => '-w',
+        samplesize => 2,
+    },
+);
+my @signvals = (
+    {
+        value => '-s',
+        signed => 1,
+    },
+    {
+        value => '-u',
+        signed => 0,
     },
 );
 
@@ -65,6 +75,11 @@ sub pcm_back {
 
         push @param, $bpp_option;
     }
+    # We need either -s or -u, otherwise we cannot be sure that sox doesn't use
+    # strange output formats like u-law
+    my ($signoption, $signformat) = $format->findvalue(\@signvals);
+    push @param, $signoption;
+    $endformat->combine($signformat);
 
     use bytes;
 
@@ -109,7 +124,7 @@ sub pcm_back {
 
     # Now get the format data from stderr:
 
-    my ($sample_size, $duration, $channels, $endian, $endfreq);
+    my ($sample_size, $duration, $channels, $endian, $endfreq, $signed);
 
     # Older soxes had a very different format of the -V3 output.  From sox's
     # Changelog, I *assume* that it changed in 13.0.0.
@@ -148,10 +163,15 @@ sub pcm_back {
         $endian = $infos{'endian type'} or die "no endianness from sox";
         $endfreq = $infos{'sample rate'} or die "no sample rate from sox";
 
+        my $encoding = $infos{'sample encoding'};
+        $signed = $encoding =~ /\bsigned\b/ ? 1 : $encoding =~ /\bunsigned\b/ ? 0
+            : die "no signed from sox";
+
     } else {
         # sox < 13.0.0
 
         my ($info) = $soxerr =~ m{^(sox: Writing Wave file:.*?bits/samp)}msi;
+        my ($info2) = $soxerr =~ m{^(sox: Output file .*? channels\s*$)}msi;
 
         ($sample_size) = $info =~ m{(\d+) bits/samp}i or die "no sample size from sox";
         $sample_size /= 8;
@@ -163,6 +183,9 @@ sub pcm_back {
         ($duration) = $soxerr =~ m{^sox: Finished writing.*?(\d+) samples}mi
             or die "no duration from sox";
         $duration /= $endfreq;
+
+        $signed = $info2 =~ /encoding signed/ ? 1 : $info2 =~ /encoding unsigned/ ? 0
+            : die "no signed from sox: $info2";
     }
 
     $endformat->combine(
@@ -171,6 +194,7 @@ sub pcm_back {
         channels => $channels,
         endian => $endian,
         freq => $endfreq,
+        signed => $signed,
     );
 
     # SoX doesn't always return what we tell it to return.

@@ -12,11 +12,11 @@ Audio::Extract::PCM - Extract PCM data from audio files
 
 =head1 VERSION
 
-Version 0.04_53
+Version 0.04_54
 
 =cut
 
-our $VERSION = '0.04_53';
+our $VERSION = '0.04_54';
 
 
 =head1 SYNOPSIS
@@ -289,6 +289,23 @@ sub read {
 =head2 error
 
 Returns the last error that occured for this object.
+
+Unfortunately this is often not very readable for computers.  For instance, if
+the file couldn't be opened because it is not there, the various backends have
+different strings that describe this error.
+
+Some of various possible errors:
+
+=over 8
+
+=item "no suitable backend found"
+
+This means that either there is no backend for this file type, or none of the
+possible backends have their dependencies installed, or none of the possible
+backends was able to satisfy the PCM format request (i.e. try a less specific
+format request).
+
+=back
 
 =cut
 
