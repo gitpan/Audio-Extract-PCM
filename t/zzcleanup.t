@@ -3,7 +3,7 @@ use Test::More tests => 1;
 use strict;
 use warnings;
 
-# that's why this test is named cleanup
+# That's why this test is named cleanup
 unlink('sine.wav');
 
 my $int = hex sprintf('%02x' x 4, map ord, qw(U N I X));

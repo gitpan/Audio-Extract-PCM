@@ -182,11 +182,18 @@ C<"-1"/"-2"/"-4"/"-8"> by then.  Note that the old flags were still recognized
     sub get_sox_version {
         return $soxver if defined $soxver;
 
-        my $vers_output = `sox --version`;
+        # Note: we use sox -h, not sox --version.
+        # The latter doesn't work with e.g. 12.17.9 (etch)
+        # Older soxes print stuff like "sox: Version 12.17.9" in the first line of sox -h,
+        # newer soxes print stuff like "sox: SoX v14.0.1" instead.
+
+        my ($vers_output, undef, $success) = qxx(qw(sox -h));
+        return undef unless $success;
+        $vers_output =~ s#[\r\n].*##s;
 
         if (defined $vers_output) {
-            ($soxver) = $vers_output =~ /v(\d+\.\d+\.\d+)/
-                or warn "Strange sox --version output: $vers_output\n";
+            ($soxver) = $vers_output =~ /(?:Version |v)(\d+\.\d+\.\d+)/
+                or warn "Strange sox -h output (first line): $vers_output\n";
         }
 
         use version;

@@ -4,23 +4,23 @@ use warnings;
 use Test::More;
 
 
-# This is in the test suite (rather than in Build.PL), because the CPAN
-# Reporters only show the test output.
+# The sox version is printed in the test suite (rather than in Build.PL),
+# because the CPAN Reporters only show the test output.
 
-my $vers_output = `sox --version`;
+my $soxbackend = 'Audio::Extract::PCM::Backend::SoX';
+unless (eval "use $soxbackend; 1") {
+    die unless $@ =~ m{^$soxbackend - trynext$}m;
 
-if (defined $vers_output) {
-    my ($soxver) = $vers_output =~ /v([\d.]+)/
-        or die "Strange sox --version output: $vers_output\n";
-    warn "SoX version $soxver found.\n";
-} else {
-    warn "The sox program was not found.  Don't be bothered, it's only one backend of many.";
+    warn "You don't seem to have sox installed.  Don't be bothered, it's only one backend of many.\n";
     plan skip_all => 'no sox';
 }
 
+my $soxversion = $soxbackend->get_sox_version();
+diag("SoX version $soxversion found.");
+
 my $help = `sox --help`;
 
-unless ($help =~ /SUPPORTED FILE FORMATS: .*\bogg\b/) {
+unless ($help =~ /SUPPORTED FILE FORMATS: .*\b(?:ogg|vorbis)\b/) {
     plan skip_all => 'your sox has no ogg';
 }
 

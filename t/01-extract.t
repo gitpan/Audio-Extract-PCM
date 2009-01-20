@@ -27,21 +27,27 @@ for my $backend ('SndFile', 'SoX', 'default') {
     my %backend;
     $backend{backend} = $backend unless 'default' eq $backend;
 
-    my $extractor = Audio::Extract::PCM->new('sine.wav', %backend);
-    my $extracted = $extractor->pcm($freq, $samplesize, $channels)
-        or die $extractor->error;
+    SKIP: {
+        my $extractor = Audio::Extract::PCM->new('sine.wav', %backend);
+        my $extracted = $extractor->pcm($freq, $samplesize, $channels);
+        unless ($extracted) {
+            die $extractor->error unless $extractor->error =~ /no suitable backend/;
 
-    ok($samples eq $$extracted, 'extract ok');
-    diag('Tested data was '.length($samples).' bytes');
+            skip "Backend $backend not available", 2;
+        }
 
-    my $bad = Audio::Extract::PCM->new('no-such-file.wav', %backend);
-    $bad->pcm($freq, $samplesize, $channels);
+        ok($samples eq $$extracted, 'extract ok');
+        diag('Tested data was '.length($samples).' bytes');
 
-    my %searchstr = (
-        SndFile => qr(Can't open no-such-file\.wav),
-        SoX     => qr(Can't open input file)i,
-    );
-    $searchstr{default} = qr( $searchstr{SndFile} | $searchstr{SoX} )x;
+        my $bad = Audio::Extract::PCM->new('no-such-file.wav', %backend);
+        $bad->pcm($freq, $samplesize, $channels);
 
-    like($bad->error, $searchstr{$backend}, 'get backend\'s errors');
+        my %searchstr = (
+            SndFile => qr(Can't open no-such-file\.wav),
+            SoX     => qr(Can't open input file)i,
+        );
+        $searchstr{default} = qr( $searchstr{SndFile} | $searchstr{SoX} )x;
+
+        like($bad->error, $searchstr{$backend}, 'get backend\'s errors');
+    };
 }

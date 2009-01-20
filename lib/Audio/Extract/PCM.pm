@@ -12,11 +12,11 @@ Audio::Extract::PCM - Extract PCM data from audio files
 
 =head1 VERSION
 
-Version 0.04_51
+Version 0.04_52
 
 =cut
 
-our $VERSION = '0.04_51';
+our $VERSION = '0.04_52';
 
 
 =head1 SYNOPSIS
@@ -244,16 +244,16 @@ Get decoded PCM samples.  Use this only after a successful call to open.
 
 =item Usage
 
-$extractor->read(
-    $buffer,          # an lvalue
-
-    append => 1,      # Optional: append to buffer
-
-    # Either a known amount of bytes:
-    bytes => 4096,
-    # or a known amount of time:
-    seconds => 2.5,
-);
+    $extractor->read(
+        $buffer,          # an lvalue
+    
+        append => 1,      # Optional: append to buffer
+    
+        # Either a known amount of bytes:
+        bytes => 4096,
+        # or a known amount of time:
+        seconds => 2.5,
+    );
 
 The method will read I<at least> as many bytes or seconds as specified.  Under
 special circumstances (near the end of file), it may read less.

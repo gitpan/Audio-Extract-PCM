@@ -1,14 +1,12 @@
 ---
 name: Audio-Extract-PCM
-version: 0.04_51
+version: 0.04_52
 author:
   - 'Christoph Bussenius <pepe@cpan.org>'
 abstract: Extract PCM data from audio files
 license: perl
 resources:
-  license: ~
-configure_requires:
-  Module::Build: 0
+  license: http://dev.perl.org/licenses/
 requires:
   Class::Accessor: 0
   Class::Inspector: 0
@@ -24,7 +22,7 @@ recommends:
 provides:
   Audio::Extract::PCM:
     file: lib/Audio/Extract/PCM.pm
-    version: 0.04_51
+    version: 0.04_52
   Audio::Extract::PCM::Backend:
     file: lib/Audio/Extract/PCM/Backend.pm
   Audio::Extract::PCM::Backend::Mad:
@@ -39,7 +37,7 @@ provides:
     file: lib/Audio/Extract/PCM/Format.pm
 no_index:
   directory: example
-generated_by: Module::Build version 0.31
+generated_by: Module::Build version 0.2807
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
   version: 1.2

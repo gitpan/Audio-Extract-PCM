@@ -45,3 +45,6 @@ Revision history for Audio-Extract-PCM
           release to include several backends, and the first release that
           doesn't depend on sox any more (it recommends it instead).
         * Quite a lot differences to 0.04.
+
+0.04_52 2009-01-20
+        * Now works better with missing backends

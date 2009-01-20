@@ -38,7 +38,7 @@ my $builder = Module::Build->new(
     no_index => {
         directory => 'example',
     },
-#    requires_external_bin => {
+#    recommends_external_bin => {
 #        sox => 0,
 #    },
     add_to_cleanup      => [ 'Audio-Extract-PCM-*' ],
