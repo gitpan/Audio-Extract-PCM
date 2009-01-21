@@ -151,20 +151,21 @@ sub pcm_back {
             warn "SoX stderr:\n$soxerr\n";
         }
 
-        $sample_size = $infos{'sample size'} or die "no sample size from sox";
+        $channels = $infos{channels}     or die "no channels from sox";
+        $endian = $infos{'endian type'}  or die "no endianness from sox";
+        $endfreq = $infos{'sample rate'} or die "no sample rate from sox";
+
+        $sample_size = $infos{'sample size'} || $infos{precision}
+            or die "no sample size from sox";
         $sample_size =~ s/^([0-9]+).*// or die "bad sample size from sox: $sample_size";
         $sample_size = $1 / 8;
 
         $duration = $infos{duration} or die "no duration from sox";
-        $duration =~ /^(\d+):(\d+\.\d+) / or die "bad duration from sox: $duration";
-        $duration = $1 * 60 + $2 ;
-
-        $channels = $infos{channels} or die "no channels from sox";
-        $endian = $infos{'endian type'} or die "no endianness from sox";
-        $endfreq = $infos{'sample rate'} or die "no sample rate from sox";
+        $duration =~ / (\d+) samples/i or die "bad duration from sox: $duration";
+        $duration = $1 / $endfreq;
 
         my $encoding = $infos{'sample encoding'};
-        $signed = $encoding =~ /\bsigned\b/ ? 1 : $encoding =~ /\bunsigned\b/ ? 0
+        $signed = $encoding =~ /\bsigned\b/i ? 1 : $encoding =~ /\bunsigned\b/i ? 0
             : die "no signed from sox";
 
     } else {
@@ -184,7 +185,7 @@ sub pcm_back {
             or die "no duration from sox";
         $duration /= $endfreq;
 
-        $signed = $info2 =~ /encoding signed/ ? 1 : $info2 =~ /encoding unsigned/ ? 0
+        $signed = $info2 =~ /encoding signed/i ? 1 : $info2 =~ /encoding unsigned/i ? 0
             : die "no signed from sox: $info2";
     }
 
@@ -310,6 +311,37 @@ C<"-1"/"-2"/"-4"/"-8"> by then.  Note that the old flags were still recognized
 #    Reverse Bits   : no
 #    Comment        : 'Processed by SoX'
 #    
+#    sox sox: effects chain: input      44100Hz 2 channels 16 bits (multi)
+#    sox sox: effects chain: output     44100Hz 2 channels 16 bits (multi)
+#
+#
+# now here comes 14.2.0:
+#
+#    sox: SoX v14.2.0
+#    sox formats: detected file format type `wav'
+#
+#    Input File     : 'sine.wav'
+#    Channels       : 2
+#    Sample Rate    : 44100
+#    Precision      : 16-bit
+#    Duration       : 00:00:10.00 = 441000 samples = 750 CDDA sectors
+#    Sample Encoding: 16-bit Signed Integer PCM
+#    Endian Type    : little
+#    Reverse Nibbles: no
+#    Reverse Bits   : no
+#
+#
+#    Output File    : '-' (wav)
+#    Channels       : 2
+#    Sample Rate    : 44100
+#    Precision      : 16-bit
+#    Duration       : 00:00:10.00 = 441000 samples = 750 CDDA sectors
+#    Sample Encoding: 16-bit Signed Integer PCM
+#    Endian Type    : little
+#    Reverse Nibbles: no
+#    Reverse Bits   : no
+#    Comment        : 'Processed by SoX'
+#
 #    sox sox: effects chain: input      44100Hz 2 channels 16 bits (multi)
 #    sox sox: effects chain: output     44100Hz 2 channels 16 bits (multi)
 

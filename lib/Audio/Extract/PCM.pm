@@ -12,11 +12,11 @@ Audio::Extract::PCM - Extract PCM data from audio files
 
 =head1 VERSION
 
-Version 0.04_54
+Version 0.04_55
 
 =cut
 
-our $VERSION = '0.04_54';
+our $VERSION = '0.04_55';
 
 
 =head1 SYNOPSIS
@@ -366,19 +366,7 @@ sub format {
 
 =item *
 
-L<Audio::Mad> - Module to decode MPEG files, in particular MP3
-
-=item *
-
-L<Ogg::Vorbis::Decoder> - Module to decode Vorbis files
-
-=item *
-
 L<http://en.wikipedia.org/wiki/Pulse-code_modulation> - PCM (Pulse-code modulation)
-
-=item *
-
-L<http://sox.sourceforge.net/> - SoX homepage
 
 =back
 

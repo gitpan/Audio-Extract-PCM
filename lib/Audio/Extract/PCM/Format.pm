@@ -52,6 +52,14 @@ In bytes per sample.
 The string C<little> or C<big>.  The constructor also accepts the string
 C<native>.
 
+This will print your native endianness ("little" or "big"):
+
+    print Audio::Extract::PCM::Format->new(endian => 'native')->endian;
+
+I've read somewhere that there are computers that have "middle endianness", and
+maybe there are computers that don't use any of the three.  I only support
+systems with either little or big endianness.
+
 =item channels
 
 A number.
