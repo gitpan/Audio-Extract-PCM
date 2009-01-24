@@ -93,9 +93,9 @@ sub open_back {
 
         if (defined $orig_ssize && $orig_ssize <= 8 * SHORT_SIZE) {
 
-            ($sampletype, $sample_format) = ('short', ref($format)->new(samplesize => SHORT_SIZE));
+            ($sampletype, $sample_format) = ('short', AEPF->new(samplesize => SHORT_SIZE));
         } else {
-            ($sampletype, $sample_format) = ('int',   ref($format)->new(samplesize => INT_SIZE));
+            ($sampletype, $sample_format) = ('int',   AEPF->new(samplesize => INT_SIZE));
         }
     }
 
@@ -148,6 +148,20 @@ sub read_back {
     my $l = $this->_sndfile->$readfunc($$workbuf, $items);
     $$buf .= $$workbuf if $args{append} && $l > 0;
     return $l * $format->samplesize;
+}
+
+
+=head2 used_versions
+
+Returns versions of L<Audio::SndFile> and libsndfile in a hash reference.
+
+=cut
+
+sub used_versions {
+    return {
+        'Audio::SndFile' => Audio::SndFile->VERSION,
+        'libsndfile'     => Audio::SndFile::lib_version(),
+    };
 }
 
 

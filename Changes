@@ -59,3 +59,11 @@ Revision history for Audio-Extract-PCM
 
 0.04_55 2009-01-21
         * Work correctly with newer soxes.
+
+0.04_56 2009-01-24
+        * Add exports for constants AEP and AEPF
+        * Work around segfault in Ogg::Vorbis::Decoder
+        * Tidy up the testing: Now there's one big backend.t that replaces sox.t, mad.t, etc.
+        * sox backend: Parse wave header from sox, don't parse sox's
+          diagnostics.  Easier.
+        * No longer default to signed (default was introduced in 0.44_51)

@@ -1,6 +1,7 @@
 Build.PL
 Changes
 example/any_to_pcm.pl
+example/mktestfiles.sh
 example/player.pl
 lib/Audio/Extract/PCM.pm
 lib/Audio/Extract/PCM/Backend.pm
@@ -15,14 +16,12 @@ META.yml
 README
 t/00-load.t
 t/01-extract.t
+t/backends.t
 t/formats.t
-t/mad.t
 t/pod-coverage.t
 t/pod.t
+t/quadchan.wav.gz
 t/sine.mp3
 t/sine.ogg
 t/sine.wav.gz
-t/sndfile.t
-t/sox.t
-t/vorbis.t
 t/zzcleanup.t

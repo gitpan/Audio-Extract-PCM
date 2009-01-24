@@ -41,10 +41,6 @@ sub new {
     my $class = shift;
     my $this = $class->SUPER::new(@_);
 
-    my $decoder = Ogg::Vorbis::Decoder->open($this->filename);
-
-    $this->_decoder($decoder);
-
     return $this;
 }
 
@@ -59,7 +55,23 @@ sub open_back {
     my $this = shift;
     my ($format) = @_;
 
-    my $decoder = $this->_decoder;
+    # Avoid passing a file name to Decoder->open.  It segfaults if it cannot
+    # open it (bug reported).
+    # Pass a file handle instead.
+
+    my $fh;
+    unless (open $fh, '<', $this->filename) {
+        $this->error("Couldn't open " . $this->filename . ": $!");
+        return ();
+    }
+
+    my $decoder = Ogg::Vorbis::Decoder->open($fh);
+    unless ($decoder) {
+        $this->error('Could not open decoder');
+        return ();
+    }
+
+    $this->_decoder($decoder);
 
     my $signed     = defined($format->signed) ? $format->signed : 1;
     my $samplesize = $format->samplesize || 2;
@@ -113,6 +125,19 @@ sub read_back {
     }
     $$buf .= $$workbuf if $args{append};
     return $l;
+}
+
+
+=head2 used_versions
+
+Returns a hash ref with the version of L<Ogg::Vorbis::Decoder> as value.
+
+=cut
+
+sub used_versions {
+    return {
+        'Ogg::Vorbis::Decoder' => Ogg::Vorbis::Decoder->VERSION,
+    };
 }
 
 

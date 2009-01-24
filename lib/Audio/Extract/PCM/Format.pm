@@ -5,6 +5,10 @@ use Carp;
 use base qw(Class::Accessor::Fast);
 use List::Util qw(max);
 use List::MoreUtils qw(any);
+use base qw(Exporter);
+
+use constant AEPF => __PACKAGE__;
+our @EXPORT = qw(AEPF);
 
 our @CARP_NOT = qw(Audio::Extract::PCM);
 
@@ -130,7 +134,6 @@ This is equivalent to:
         samplesize  => $samplesize,
         channels    => $channels,
         endian      => 'native',
-        signed      => 1,
     );
 
 =cut
@@ -143,7 +146,6 @@ sub new {
             samplesize => $_[1],
             channels   => $_[2],
             endian     => 'native',
-            signed     => 1,
         ) : @_);
 
     my $this = $class->SUPER::new();
@@ -354,6 +356,8 @@ sub satisfied {
         $other = __PACKAGE__->new(@_);
     }
 
+    confess 'no other format given' unless ref $other;
+
     for my $field (@fields) {
         next unless $this->required->{$field};
         next unless defined $other->$field();
@@ -366,6 +370,13 @@ sub satisfied {
 
     return 1;
 }
+
+
+=head1 EXPORTS
+
+This package exports the constant "AEPF", which expands to the name of this module.
+
+=cut
 
 
 1

@@ -67,10 +67,9 @@ sub pcm_back {
     my $fn = $this->{filename} or croak 'No filename';
 
     my @param;
-    my $endformat = ref($format)->new();
 
     if (defined $format->samplesize) {
-        (my $bpp_option, $endformat) = $format->findvalue(\@bppvals)
+        my ($bpp_option, $bpp_format) = $format->findvalue(\@bppvals)
             or return 'trynext';
 
         push @param, $bpp_option;
@@ -79,7 +78,6 @@ sub pcm_back {
     # strange output formats like u-law
     my ($signoption, $signformat) = $format->findvalue(\@signvals);
     push @param, $signoption;
-    $endformat->combine($signformat);
 
     use bytes;
 
@@ -88,11 +86,13 @@ sub pcm_back {
     push @param, '-r'.$format->freq     if defined $format->freq;
     push @param, '-c'.$format->channels if defined $format->channels;
 
-    my @command = ('sox', '-V3', $fn, @param, '-twav', '-');
+    my @command = ('sox', $fn, @param, '-twav', '-');
 
-    warn qq(Running "@command"\n") if $ENV{DEBUG};
+    warn qq(Running "@command"\n) if $ENV{DEBUG};
 
-    my ($pcm, $soxerr, $success) = qxx(@command);
+    my $pcm = \do {my $dummy};
+
+    ($$pcm, my ($soxerr, $success)) = qxx(@command);
 
     chomp $soxerr;
 
@@ -102,6 +102,7 @@ sub pcm_back {
 
     # Now that we use -V3, we cannot display all that stderr stuff, so the
     # above is commented out.
+    # (update: no longer true, we don't use -V3 any more)
 
     unless ($success) {
         my $err;
@@ -114,7 +115,7 @@ sub pcm_back {
             $err = length($soxerr) ? $soxerr : "Error running sox";
         }
 
-        undef $pcm;
+        undef $$pcm;
 
         $this->error($err);
         return ();
@@ -122,81 +123,9 @@ sub pcm_back {
 
     # warn $soxerr if length $soxerr;
 
-    # Now get the format data from stderr:
+    # Now get the format data
 
-    my ($sample_size, $duration, $channels, $endian, $endfreq, $signed);
-
-    # Older soxes had a very different format of the -V3 output.  From sox's
-    # Changelog, I *assume* that it changed in 13.0.0.
-    # What I actually tested is 12.17.9 and 14.0.1, for sample output see the
-    # comment at the bottom of this module.
-
-
-    if (get_sox_version() >= '13.0.0') {
-
-        my %infos = (
-            # Parse table
-            map {
-                /^(.+?)\s*:\s*(.*?)\s*$/ ? (lc $1, $2) : ()
-            }
-            # Find output file stanza
-            grep {
-                /^Output File\s*:/i .. /^\s*$/
-            }
-            # Split lines
-            $soxerr =~ /[^\n\r]+/g
-        );
-
-        if ($ENV{DEBUG}) {
-            warn "SoX stderr:\n$soxerr\n";
-        }
-
-        $channels = $infos{channels}     or die "no channels from sox";
-        $endian = $infos{'endian type'}  or die "no endianness from sox";
-        $endfreq = $infos{'sample rate'} or die "no sample rate from sox";
-
-        $sample_size = $infos{'sample size'} || $infos{precision}
-            or die "no sample size from sox";
-        $sample_size =~ s/^([0-9]+).*// or die "bad sample size from sox: $sample_size";
-        $sample_size = $1 / 8;
-
-        $duration = $infos{duration} or die "no duration from sox";
-        $duration =~ / (\d+) samples/i or die "bad duration from sox: $duration";
-        $duration = $1 / $endfreq;
-
-        my $encoding = $infos{'sample encoding'};
-        $signed = $encoding =~ /\bsigned\b/i ? 1 : $encoding =~ /\bunsigned\b/i ? 0
-            : die "no signed from sox";
-
-    } else {
-        # sox < 13.0.0
-
-        my ($info) = $soxerr =~ m{^(sox: Writing Wave file:.*?bits/samp)}msi;
-        my ($info2) = $soxerr =~ m{^(sox: Output file .*? channels\s*$)}msi;
-
-        ($sample_size) = $info =~ m{(\d+) bits/samp}i or die "no sample size from sox";
-        $sample_size /= 8;
-
-        ($endfreq) = $info =~ m{(\d+) samp/sec}i or die "no sample rate from sox";
-        $endian = 'little'; # ?
-        ($channels) = $info =~ m{(\d+) channels}i or die "no channels from sox";
-
-        ($duration) = $soxerr =~ m{^sox: Finished writing.*?(\d+) samples}mi
-            or die "no duration from sox";
-        $duration /= $endfreq;
-
-        $signed = $info2 =~ /encoding signed/i ? 1 : $info2 =~ /encoding unsigned/i ? 0
-            : die "no signed from sox: $info2";
-    }
-
-    $endformat->combine(
-        samplesize => $sample_size,
-        duration => $duration,
-        channels => $channels,
-        endian => $endian,
-        freq => $endfreq,
-        signed => $signed,
-    );
+    my ($headersize, $endformat) = _parsewav($$pcm);
 
     # SoX doesn't always return what we tell it to return.
     # Quote: "sox wav: Do not support unsigned with 16-bit data.  Forcing to Signed."
@@ -204,9 +133,75 @@ sub pcm_back {
 
     $this->format($endformat);
 
-    substr($pcm, 0, 44, ''); # strip wave header (we know the details, we specified them to sox)
+    substr($$pcm, 0, $headersize, ''); # strip wave header
 
-    return \$pcm;
+    return $pcm;
+
+    # Following is the old sox diagnostics parsing code, for historic reasons.
+
+    # Older soxes had a very different format of the -V3 output.  From sox's
+    # Changelog, I *assume* that it changed in 13.0.0.
+    # What I actually tested is 12.17.9 and 14.0.1, for sample output see the
+    # comment at the bottom of this module.
+
+    # my ($sample_size, $duration, $channels, $endian, $endfreq, $signed);
+    #
+    # if (get_sox_version() >= '13.0.0') {
+    # 
+    #     my %infos = (
+    #         # Parse table
+    #         map {
+    #             /^(.+?)\s*:\s*(.*?)\s*$/ ? (lc $1, $2) : ()
+    #         }
+    #         # Find output file stanza
+    #         grep {
+    #             /^Output File\s*:/i .. /^\s*$/
+    #         }
+    #         # Split lines
+    #         $soxerr =~ /[^\n\r]+/g
+    #     );
+    # 
+    #     if ($ENV{DEBUG}) {
+    #         warn "SoX stderr:\n$soxerr\n";
+    #     }
+    # 
+    #     $channels = $infos{channels}     or die "no channels from sox";
+    #     $endian = $infos{'endian type'}  or die "no endianness from sox";
+    #     $endfreq = $infos{'sample rate'} or die "no sample rate from sox";
+    # 
+    #     $sample_size = $infos{'sample size'} || $infos{precision}
+    #         or die "no sample size from sox";
+    #     $sample_size =~ s/^([0-9]+).*// or die "bad sample size from sox: $sample_size";
+    #     $sample_size = $1 / 8;
+    # 
+    #     $duration = $infos{duration} or die "no duration from sox";
+    #     $duration =~ / (\d+) samples/i or die "bad duration from sox: $duration";
+    #     $duration = $1 / $endfreq;
+    # 
+    #     my $encoding = $infos{'sample encoding'};
+    #     $signed = $encoding =~ /\bsigned\b/i ? 1 : $encoding =~ /\bunsigned\b/i ? 0
+    #         : die "no signed from sox";
+    # 
+    # } else {
+    #     # sox < 13.0.0
+    # 
+    #     my ($info) = $soxerr =~ m{^(sox: Writing Wave file:.*?bits/samp)}msi;
+    #     my ($info2) = $soxerr =~ m{^(sox: Output file .*? channels\s*$)}msi;
+    # 
+    #     ($sample_size) = $info =~ m{(\d+) bits/samp}i or die "no sample size from sox";
+    #     $sample_size /= 8;
+    # 
+    #     ($endfreq) = $info =~ m{(\d+) samp/sec}i or die "no sample rate from sox";
+    #     $endian = 'little'; # ?
+    #     ($channels) = $info =~ m{(\d+) channels}i or die "no channels from sox";
+    # 
+    #     ($duration) = $soxerr =~ m{^sox: Finished writing.*?(\d+) samples}mi
+    #         or die "no duration from sox";
+    #     $duration /= $endfreq;
+    # 
+    #     $signed = $info2 =~ /encoding signed/i ? 1 : $info2 =~ /encoding unsigned/i ? 0
+    #         : die "no signed from sox: $info2";
+    # }
 }
 
 
@@ -260,6 +255,89 @@ C<"-1"/"-2"/"-4"/"-8"> by then.  Note that the old flags were still recognized
         $soxver = version->new($soxver);
 
         return $soxver;
+    }
+}
+
+
+=head2 used_versions
+
+Abstract interface to L</get_sox_version>.
+
+=cut
+
+sub used_versions {
+    return {
+        sox => get_sox_version(),
+    };
+}
+
+
+# This analyzes the header of the wave files that sox outputs.
+
+# I used to parse the diagnostics output from sox -V3, but when I realized how
+# different it is in different sox versions, I found that it's easier to just
+# parse the wave header that sox produces.  This is a very simple wave header
+# analyzer; it is designed only for the headers from sox with the flags that we
+# give to it.  There are more sophisticated modules like Audio::Wav for other
+# wave files.
+sub _parsewav {
+    my ($header) = @_;
+
+    my $headersize     = 44;
+    my $datachunkstart = 36;
+
+    # parse riff header
+    my ($RIFF, $riffsize, $WAVE) = unpack ('a4Va4', $header);
+    die 'no riff' unless 'RIFF' eq $RIFF;
+    die 'no wave' unless 'WAVE' eq $WAVE;
+
+    # parse format header
+    my ($fmt, $compr, $chans, $freq, $bps) = unpack (
+        '@12a4x4vvVx6v', $header);
+
+    die 'no fmt' unless 'fmt ' eq $fmt;
+
+    if (0xFFFE == $compr) {
+        # WAVE_FORMAT_EXTENSIBLE
+
+        (my ($extsize), $compr, my ($strange_magic_thing)) =
+            unpack('@36vx6vH28', $header);
+
+        unless ('000000001000800000AA00389B71' eq uc $strange_magic_thing) {
+            die 'unexpected strange magic thing';
+        }
+        die "unexpected extsize $extsize" unless 22 == $extsize;
+
+        $_ += 24 for $headersize, $datachunkstart;
+    }
+
+    die 'only PCM/uncompressed supported' unless 1 == $compr;
+
+    my $samplesize = $bps / 8;
+    die 'only multiples of 8bps supported' unless $samplesize == int $samplesize;
+
+    {
+        my ($chunkname, $chunksize) = unpack("\@${datachunkstart}a4V", $header);
+
+        if ('fact' eq $chunkname) {
+            $_ += 12 for $headersize, $datachunkstart;
+            redo;
+        }
+
+        die 'no "data"' unless 'data' eq $chunkname;
+
+        # Alright, we're in the data chunk at last.
+
+        my $duration = $chunksize / $chans / $samplesize / $freq;
+
+        return $headersize, AEPF->new(
+            channels   => $chans,
+            freq       => $freq,
+            duration   => $duration,
+            samplesize => $samplesize,
+            signed     => ($samplesize > 1 ? 1 : 0),
+            endian     => 'little',
+        );
     }
 }
 

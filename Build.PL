@@ -31,6 +31,7 @@ my $builder = Module::Build->new(
         'Class::Accessor'   => 0,
         'version'           => 0,
         'List::MoreUtils'   => 0,
+        'perl'              => 5.006,
     },
     recommends => {
         'Sys::Mmap::Simple' => 0, # only recommended for the Mad backend

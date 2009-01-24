@@ -2,7 +2,7 @@ NAME
     Audio::Extract::PCM - Extract PCM data from audio files
 
 VERSION
-    Version 0.04_55
+    Version 0.04_56
 
 SYNOPSIS
     This module's purpose is to extract PCM data from various audio formats.
@@ -15,8 +15,8 @@ SYNOPSIS
 
     Usage example:
 
-        use Audio::PCM::Extract;
-        my $extractor = Audio::PCM::Extract->new('song.ogg');
+        use Audio::Extract::PCM;
+        my $extractor = Audio::Extract::PCM->new('song.ogg');
 
         $extractor->open(endian => 'native', samplesize => 2) or die $extractor->error;
 
@@ -136,6 +136,17 @@ METHODS
     You should only call this method after a *successfull* call to "open" or
     "pcm". If you called "open", this method shall return the same format
     that "open" has returned.
+
+EXPORTS
+    This module exports the following constants:
+
+        AEP  = "Audio::Extract::PCM"
+        AEPF = "Audio::Extract::PCM::Format"
+
+    This enables you to write:
+
+        use Audio::Extract::PCM;
+        my $aep = AEP->new($filename);
 
 SEE ALSO
     *       <http://en.wikipedia.org/wiki/Pulse-code_modulation> - PCM

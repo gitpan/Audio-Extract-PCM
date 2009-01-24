@@ -5,6 +5,10 @@ use Carp;
 use IO::CaptureOutput qw(qxx);
 use Audio::Extract::PCM::Format;
 use Class::Inspector;
+use base qw(Exporter);
+
+use constant AEP  => __PACKAGE__;
+our @EXPORT = qw(AEP AEPF);
 
 =head1 NAME
 
@@ -12,11 +16,11 @@ Audio::Extract::PCM - Extract PCM data from audio files
 
 =head1 VERSION
 
-Version 0.04_55
+Version 0.04_56
 
 =cut
 
-our $VERSION = '0.04_55';
+our $VERSION = '0.04_56';
 
 
 =head1 SYNOPSIS
@@ -31,8 +35,8 @@ CPAN's audio decoding modules.
 
 Usage example:
 
-    use Audio::PCM::Extract;
-    my $extractor = Audio::PCM::Extract->new('song.ogg');
+    use Audio::Extract::PCM;
+    my $extractor = Audio::Extract::PCM->new('song.ogg');
 
     $extractor->open(endian => 'native', samplesize => 2) or die $extractor->error;
 
@@ -359,6 +363,18 @@ sub format {
     return $this->{backend}->format;
 }
 
+
+=head1 EXPORTS
+
+This module exports the following constants:
+
+    AEP  = "Audio::Extract::PCM"
+    AEPF = "Audio::Extract::PCM::Format"
+
+This enables you to write:
+
+    use Audio::Extract::PCM;
+    my $aep = AEP->new($filename);
 
 =head1 SEE ALSO
 

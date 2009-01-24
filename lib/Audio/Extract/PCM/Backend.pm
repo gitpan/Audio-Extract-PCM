@@ -154,6 +154,7 @@ sub open {
     my ($format) = @_;
 
     my $ret = $this->open_back(@_);
+    return () unless defined $ret;
 
     return 'trynext' unless $format->satisfied($ret);
 
@@ -213,6 +214,19 @@ sub read {
         return $bytes_read;
     }
 }
+
+
+=head2 used_versions
+
+Should be implemented by the backends to describe the versions of the modules,
+libraries and other pieces of software that are being used.
+
+Should return a hash reference where the keys are the names of the products,
+and the values are their versions.  The versions may be strings of any kind (or
+objects that can be stringified).  The intend is to provide an easy way to show
+the user what software was used.
+
+=cut
 
 
 1

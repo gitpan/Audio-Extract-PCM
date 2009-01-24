@@ -221,7 +221,10 @@ sub open_back {
     # Now everything is set up for the first call to _crunch_frame, which will
     # finally provide us with the sought-after sample rate.
 
-    $this->_crunch_frame or return 0; # 0 for no data
+    $this->_crunch_frame or do {
+        $this->error("could not decode file"); # XXX what about empty files?
+        return ();
+    };
 
     $endformat->combine(channels => $this->frame->NCHANNELS);
     return 'trynext' unless $format->satisfied($endformat);
@@ -314,6 +317,19 @@ sub read {
     }
 
     return $bytes_read;
+}
+
+
+=head2 used_versions
+
+Returns a hashref with Audio::Mad's version as a value.
+
+=cut
+
+sub used_versions {
+    return {
+        'Audio::Mad' => Audio::Mad->VERSION,
+    };
 }
 
 
