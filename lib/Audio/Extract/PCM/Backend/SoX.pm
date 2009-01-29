@@ -76,8 +76,8 @@ sub pcm_back {
     }
     # We need either -s or -u, otherwise we cannot be sure that sox doesn't use
     # strange output formats like u-law.
-    # We default to "-s" if no signedness is requested.  Newer soxes still use
-    # unsigned if the input file is more than 8-bit, older soxes don't and
+    # We default to "-s" if no signedness is requested.  Older soxes still use
+    # unsigned if the input file is more than 8-bit, newer soxes don't and
     # convert to 8-bit instead.  Cannot do anything about it, I guess.  Sox
     # doesn't have a flag that says "either signed or unsigned, I need
     # uncompressed PCM format!"
@@ -285,6 +285,11 @@ sub used_versions {
 # analyzer; it is designed only for the headers from sox with the flags that we
 # give to it.  There are more sophisticated modules like Audio::Wav for other
 # wave files.
+
+# By the way, why don't I use sox' "raw" format?  Well, for one thing, I'd
+# have to specify exact format parameters to sox, while for wave output, it
+# will default to the input format, which seems wiser.  I think there was
+# another reason, but I can't remember right now...
 sub _parsewav {
     my ($header) = @_;
 

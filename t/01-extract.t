@@ -2,14 +2,14 @@
 use strict;
 use warnings;
 use Audio::Extract::PCM;
-use Test::More tests => 12;
+use Test::More tests => 18;
 use Compress::Zlib;
 use bytes;
 
 
 my $wav;
 
-for my $testsound (qw(sine quadchan)) {
+for my $testsound (qw(sine quadchan quadchan-wavpcm)) {
     diag("Testing with sound $testsound...");
 
     my $wav = Compress::Zlib::memGunzip (do {
@@ -34,12 +34,27 @@ for my $testsound (qw(sine quadchan)) {
         $backend{backend} = $backend unless 'default' eq $backend;
 
         SKIP: {
+
+            if ($testsound eq 'quadchan' && $backend =~ /SoX|default/) {
+                # this would break with sox < 13.0.0
+                # (need to add a sox version test)
+                skip 'Avoiding to expose sox to quadchan', 2;
+            }
+
             my $extractor = Audio::Extract::PCM->new("$testsound.wav", %backend);
             my $extracted = $extractor->pcm($freq, $samplesize, $channels);
             unless ($extracted) {
-                die $extractor->error unless $extractor->error =~ /no suitable backend/;
-
-                skip "Backend $backend not available", 2;
+                if ($extractor->error =~ /no suitable backend/) {
+                    # only skip if the backend is really not available.
+                    # "no suitable backend" might occur on other occasions, too
+                    # (bad parameters).  we want to know if our tests do that.
+                    unless ($backend =~ /SoX|SndFile/ && AEP->_backend_available($backend)) {
+                        skip "Backend $backend not available", 2;
+                    }
+                }
+                diag('extraction error: ' . $extractor->error);
+                fail('extraction');
+                skip 'Could not extract with this backend', 1;
             }
 
             ok($samples eq $$extracted, 'extract ok');

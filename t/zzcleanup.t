@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # That's why this test is named cleanup
-unlink('sine.wav', 'quadchan.wav');
+unlink('sine.wav', 'quadchan.wav', 'quadchan-wavpcm.wav');
 
 
 # Various tests:

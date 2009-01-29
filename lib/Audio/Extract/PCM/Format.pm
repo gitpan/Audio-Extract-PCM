@@ -117,7 +117,7 @@ Additionally, there are some special ways to say what you want:
         # The frequency *must* be one of 44100, 48000
         freq => [44100, 48000],
 
-        # If *possibly*, you would like little endian, but you accept other
+        # If *possible*, you would like little endian, but you accept other
         # values too (aka "nice-to-have" values):
         endian => \['little'],
     );

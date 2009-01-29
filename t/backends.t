@@ -29,6 +29,16 @@ my %files = (
             channels   => 4,
             duration   => 10,
         },
+        WAV_EXTENSIBLE => 1,
+    },
+    {
+        filename => 'quadchan-wavpcm.wav',
+        verify   => {
+            samplesize => 2,
+            freq       => 44100,
+            channels   => 4,
+            duration   => 10,
+        },
     },
     ],
     ogg => [
@@ -113,6 +123,8 @@ for my $test (values %tests) {
     my @testfiles = map @$_, @files{@{$test->{types}}};
     $test->{testcount} = sum map {;scalar keys %{$_->{verify}}} @testfiles;
 
+    # open/pcm test
+    $test->{testcount} += @testfiles;
     # two length tests for each open
     $test->{testcount} += 2 * @testfiles if 'open' eq $test->{interface};
 
@@ -154,26 +166,44 @@ for my $test (values %tests) {
 
         for my $type (@{$test->{types}}) {
             for my $file (@{$files{$type}}) {
+                diag('Testing with file ' . $file->{filename});
                 my $extractor = AEP->new($file->{filename}, backend => $backend);
 
-                if ('pcm' eq $test->{interface}) {
-                    $extractor->pcm(undef, undef, undef);
-                } elsif ('open' eq $test->{interface}) {
-                    $extractor->open(undef, undef, undef) or die $extractor->error;
+                # WAV_EXTENSIBLE was introduced in SoX 13.0.0
+                my $doesntwork = $file->{WAV_EXTENSIBLE}
+                    && 'SoX' eq $backend && $fullbackend->get_sox_version() < '13.0.0';
 
-                    # warns with 5.6.2:
-                    # my $l = $extractor->read(my $buf, bytes => 4096);
+                diag("testing for brokenness (WAV_EXTENSIBLE is not available before SoX 13.0.0)") if $doesntwork;
 
-                    my $l = $extractor->read(my ($buf), bytes => 4096);
-                    cmp_ok($l, '>=', 4096);
-                    is(length($buf), $l);
-                } else {
-                    die $test->{interface};
-                }
+                # Ideally the SoX backend should return "trynext" in this case.
+                # However, it is designed to be a last resort anyway, and sox'
+                # error message is more descriptive than "no suitable backend
+                # found".
 
-                while (my ($key, $value) = each %{$file->{verify}}) {
-                    next if $test->{exclude}{$key};
-                    is($extractor->format->$key(), $value, $key);
+                SKIP: {
+                    if ('pcm' eq $test->{interface}) {
+                        ok(($extractor->pcm(undef, undef, undef) xor $doesntwork), 'pcm() works')
+                            && !$doesntwork
+                            or skip 'could not even extract', scalar keys %{$file->{verify}};
+                    } elsif ('open' eq $test->{interface}) {
+                        ok(($extractor->open(undef, undef, undef) xor $doesntwork), 'open() works')
+                            && !$doesntwork
+                            or skip 'could not even extract', 2 + scalar keys %{$file->{verify}};
+
+                        # warns with 5.6.2:
+                        # my $l = $extractor->read(my $buf, bytes => 4096);
+
+                        my $l = $extractor->read(my ($buf), bytes => 4096);
+                        cmp_ok($l, '>=', 4096);
+                        is(length($buf), $l);
+                    } else {
+                        die $test->{interface};
+                    }
+
+                    while (my ($key, $value) = each %{$file->{verify}}) {
+                        next if $test->{exclude}{$key};
+                        is($extractor->format->$key(), $value, $key);
+                    }
                 }
             }
         }
