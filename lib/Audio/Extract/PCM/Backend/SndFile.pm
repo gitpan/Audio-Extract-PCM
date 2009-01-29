@@ -165,11 +165,11 @@ sub used_versions {
 }
 
 
-1;
-
 
 =head1 TODO
 
 Thoroughly test this for float pcm files, especially normalization issues.
 
 =cut
+
+our $AVAILABLE = 1;

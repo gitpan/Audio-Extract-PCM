@@ -89,7 +89,7 @@ my %tests = (
 
 # Based on sox's capabilities, add extra tests to the above data structure
 
-if (eval 'use Audio::Extract::PCM::Backend::SoX') {
+if (AEP->_backend_available('SoX')) {
     my ($help, undef, $status) = qxy('sox', '-h');
 
     if (WIFEXITED($status)) {
@@ -137,7 +137,7 @@ for my $test (values %tests) {
         my $fullbackend = AEP . '::Backend::' . $backend;
 
         diag("Testing backend $backend");
-        unless (eval "use $fullbackend; 1") {
+        unless (AEP->_backend_available($backend)) {
             diag("Backend is not available");
             skip "no $backend", $test->{testcount};
         }

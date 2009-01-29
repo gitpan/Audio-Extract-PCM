@@ -342,7 +342,7 @@ sub _parsewav {
 }
 
 
-1;
+our $AVAILABLE = 1;
 
 # Sample -V3 output from sox:
 

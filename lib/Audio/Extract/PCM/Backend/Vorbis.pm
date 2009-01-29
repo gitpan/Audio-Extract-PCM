@@ -141,4 +141,4 @@ sub used_versions {
 }
 
 
-1
+our $AVAILABLE = 1;

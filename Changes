@@ -67,3 +67,7 @@ Revision history for Audio-Extract-PCM
         * sox backend: Parse wave header from sox, don't parse sox's
           diagnostics.  Easier.
         * No longer default to signed (default was introduced in 0.44_51)
+
+0.04_57 2009-01-29
+        * Fix a problem with determining the availability of backends
+          (introduce those $AVAILABLE variables).

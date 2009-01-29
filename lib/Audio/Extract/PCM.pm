@@ -16,11 +16,11 @@ Audio::Extract::PCM - Extract PCM data from audio files
 
 =head1 VERSION
 
-Version 0.04_56
+Version 0.04_57
 
 =cut
 
-our $VERSION = '0.04_56';
+our $VERSION = '0.04_57';
 
 
 =head1 SYNOPSIS
@@ -95,8 +95,6 @@ sub new {
 }
 
 
-my %dont_use_backends;
-
 sub _initbackend {
     my $this = shift;
     my ($failed) = @_;
@@ -116,26 +114,76 @@ sub _initbackend {
         $this->{error} = 'no suitable backend found';
         return ();
     }
-    my $backend = join '::', __PACKAGE__, 'Backend', $this->{backends}[0];
+    my $backend_short =  $this->{backends}[0];
+    my $backend = join '::', __PACKAGE__, 'Backend', $backend_short;
+
+    if ($this->_backend_available($backend_short)) {
+        $this->{backend} = $backend->new(filename => $this->{filename});
+        return 1;
+    }
+
+    return $this->_initbackend('failed');
+}
+
+
+# =head2 backend_available
+# 
+# (Class method.)
+# 
+# Parameter: A backend name, e.g. C<"Mad">.
+# 
+# Checks whether a specific backend is available on this system.  This might load
+# the backend module.
+# 
+# Returns true or false.
+# 
+# =cut
+
+# (Pod removed and method made private.  I don't like the idea of having public
+# methods that use string-eval on their parameters.)
+
+my %dont_use_backends;
+
+sub _backend_available {
+    my $class = shift;
+    croak('This is a (class) method') unless $class->isa(__PACKAGE__);
+    croak('One parameter expected')   unless 1 == @_;
+    my ($backend_short) = @_;
+
+    # Better be sure before doing eval and such evil things
+    # (However I hope that you don't pass untrusted strings to this method.)
+    unless ($backend_short =~ /^[A-Z]\w*\z/) {
+        croak("Bad backend name: $backend_short");
+    }
+    
+    my $backend = join '::', __PACKAGE__, 'Backend', $backend_short;
+
+    my $available_ref = do {no strict 'refs'; \${$backend . '::AVAILABLE'}};
+    return 1 if $$available_ref;
 
     if (Class::Inspector->installed($backend) && ! $dont_use_backends{$backend}) {
 
         local $@;
         local $SIG{__DIE__};
 
-        if (eval "require $backend; 1") {
+        # The AVAILABLE check is done to make sure we avoid the problem
+        # discussed at http://www.perlmonks.org/?node_id=646888
 
-            $this->{backend} = $backend->new(filename => $this->{filename});
+        # "require" won't fail if %INC has the backend.  %INC might have the
+        # backend even though it does not load, maybe because it was already
+        # tried to require in the test suite.
+        # Therefore we have an extra check via the
+        # $Audio::Extract::PCM::Backend::*::AVAILABLE variables.  They get set
+        # only if the backend compiles fine.
+
+        if (eval "require $backend; 1" && $$available_ref) {
             return 1;
-
         }
         unless ($@ =~ m{^\Q$backend\E - trynext\s}) {
             warn;
         }
         $dont_use_backends{$backend} = 1;
     }
-
-    return $this->_initbackend('failed');
 }
 
 
