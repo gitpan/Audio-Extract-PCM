@@ -30,12 +30,12 @@ my @bppvals = (
 );
 my @signvals = (
     {
-        value => '-s',
-        signed => 1,
-    },
-    {
         value => '-u',
         signed => 0,
+    },
+    {
+        value => '-s',
+        signed => 1,
     },
 );
 
@@ -75,7 +75,12 @@ sub pcm_back {
         push @param, $bpp_option;
     }
     # We need either -s or -u, otherwise we cannot be sure that sox doesn't use
-    # strange output formats like u-law
+    # strange output formats like u-law.
+    # We default to "-s" if no signedness is requested.  Newer soxes still use
+    # unsigned if the input file is more than 8-bit, older soxes don't and
+    # convert to 8-bit instead.  Cannot do anything about it, I guess.  Sox
+    # doesn't have a flag that says "either signed or unsigned, I need
+    # uncompressed PCM format!"
     my ($signoption, $signformat) = $format->findvalue(\@signvals);
     push @param, $signoption;
 

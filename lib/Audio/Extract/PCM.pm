@@ -16,11 +16,11 @@ Audio::Extract::PCM - Extract PCM data from audio files
 
 =head1 VERSION
 
-Version 0.04_57
+Version 0.04_58
 
 =cut
 
-our $VERSION = '0.04_57';
+our $VERSION = '0.04_58';
 
 
 =head1 SYNOPSIS
@@ -184,6 +184,7 @@ sub _backend_available {
         }
         $dont_use_backends{$backend} = 1;
     }
+    return 0;
 }
 
 

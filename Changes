@@ -71,3 +71,7 @@ Revision history for Audio-Extract-PCM
 0.04_57 2009-01-29
         * Fix a problem with determining the availability of backends
           (introduce those $AVAILABLE variables).
+
+0.04_58 2009-01-29
+        * Complete that fix...
+        * sox chooses signed over unsigned now by default (on older soxes...)

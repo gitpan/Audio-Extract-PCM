@@ -2,7 +2,7 @@ NAME
     Audio::Extract::PCM - Extract PCM data from audio files
 
 VERSION
-    Version 0.04_57
+    Version 0.04_58
 
 SYNOPSIS
     This module's purpose is to extract PCM data from various audio formats.
